@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("In ms^-1")][SerializeField] private float yPlayerSpeed = 15;
     [Tooltip("In meters")][SerializeField] private float xRange = 5;
     [Tooltip("In meters")][SerializeField] private float yRange = 3;
+    [SerializeField] private GameObject[] canons;
 
     [Header("Position Factors")]
     [SerializeField] private float positionPitchFactor = -5f;
@@ -25,7 +26,6 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -34,9 +34,11 @@ public class PlayerController : MonoBehaviour
         if (isControlEnabled)
         {
             ProcessTranslation();
-            ProcessRotation(); 
+            ProcessRotation();
+            ProcessFiring();
         }
     }
+
 
     private void OnPlayerDeath()
     {
@@ -67,5 +69,26 @@ public class PlayerController : MonoBehaviour
         newXPos = Mathf.Clamp(newXPos, -xRange, xRange);
         newYPos = Mathf.Clamp(newYPos, -yRange, yRange);
         transform.localPosition = new Vector3(newXPos, newYPos, transform.localPosition.z);
+    }
+    private void ProcessFiring()
+    {
+        if (CrossPlatformInputManager.GetButton("Fire"))
+        {
+            SetCanonsActive(true);
+        }
+        else
+        {
+            SetCanonsActive(false);
+        }
+    }
+
+
+    private void SetCanonsActive(bool isActive)
+    {
+        foreach (GameObject canon in canons)
+        {
+            var emission = canon.GetComponent<ParticleSystem>().emission;
+            emission.enabled = isActive;
+        }
     }
 }
